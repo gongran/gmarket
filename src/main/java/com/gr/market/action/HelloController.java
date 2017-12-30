@@ -22,22 +22,28 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.gr.market.ApiClient;
 import com.gr.market.Market02Application;
 import com.gr.market.entity.BlockChain;
+import com.gr.market.entity.SysParam;
 import com.gr.market.response.Account;
 import com.gr.market.response.Kline;
 import com.gr.market.service.BlockChainService;
+import com.gr.market.service.SysParamService;
 import com.gr.market.util.CommonUtil;
 import com.gr.market.util.DateUtil;
 import com.gr.market.util.JsonUtil;
 
 @Controller
 public class HelloController {
-	static final String API_KEY = "";
-	static final String API_SECRET = "";
 	@Autowired
 	BlockChainService blockChainService;
+	@Autowired
+	SysParamService sysParamService;
+	String API_KEY = null;
+	String API_SECRET = null;
 
 	@RequestMapping("/index") // url
 	public String index(Map<String, Object> map) throws IOException {
+		API_KEY = sysParamService.getSysParamByName("API_KEY").get().getParamValue();
+		API_SECRET = sysParamService.getSysParamByName("API_SECRET").get().getParamValue();
 		ApiClient client = new ApiClient(API_KEY, API_SECRET);
 		Map<String, String> params = new HashMap<>();
 		params.put("symbol", "bchusdt");
@@ -91,6 +97,8 @@ public class HelloController {
 	@RequestMapping("/account02")
 	@ResponseBody
 	public List<Map<String, Object>> account(Map<String, Object> map, boolean isAll) throws IOException {
+		API_KEY = sysParamService.getSysParamByName("API_KEY").get().getParamValue();
+		API_SECRET = sysParamService.getSysParamByName("API_SECRET").get().getParamValue();
 		ApiClient client = new ApiClient(API_KEY, API_SECRET);
 		List<Account> accounts = client.getAccounts();
 		Map<String, String> params = null;
@@ -112,7 +120,8 @@ public class HelloController {
 	}
 
 	public Map<String, Map<String, Object>> allMarket() {
-
+		API_KEY = sysParamService.getSysParamByName("API_KEY").get().getParamValue();
+		API_SECRET = sysParamService.getSysParamByName("API_SECRET").get().getParamValue();
 		ApiClient client = new ApiClient(API_KEY, API_SECRET);
 		List<BlockChain> list = blockChainService.getAllBlockChain();
 		Map<String, String> params = new HashMap<>();
@@ -216,11 +225,11 @@ public class HelloController {
 					Double balance = Double.valueOf(bstr);
 					if ("trade".equals(tmap.get("type"))) {
 						map.put("trade", bstr);
-						map.put("cny_trade", CommonUtil.amountFomat(CommonUtil.multiply(bstr, cny),8));
+						map.put("cny_trade", CommonUtil.amountFomat(CommonUtil.multiply(bstr, cny), 8));
 						map.put("v_trade", CommonUtil.amountFomat(bstr, 8));
 					} else {
 						map.put("frozen", tmap.get("balance"));
-						map.put("cny_frozen", CommonUtil.amountFomat(CommonUtil.multiply(bstr, cny),8));
+						map.put("cny_frozen", CommonUtil.amountFomat(CommonUtil.multiply(bstr, cny), 8));
 						map.put("v_frozen", CommonUtil.amountFomat(bstr, 8));
 					}
 					if (!balance.equals(new Double(0))) {

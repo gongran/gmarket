@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.gr.market.entity.BlockChain;
@@ -15,6 +16,7 @@ import com.gr.market.service.SysParamService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@EnableCaching
 public class Market02ApplicationTests {
 	@Autowired
 	SysParamService sysParamService;
@@ -27,15 +29,17 @@ public class Market02ApplicationTests {
 
 	@Test
 	public void getSysParam() {
-		Optional<SysParam> sp = sysParamService.getSysParamByName("cnyusd");
-		if (sp.isPresent()) {
-			System.out.println(sp.get().getParamValue());
+		for (int i = 0; i < 3; i++) {
+			Optional<SysParam> sp = sysParamService.getSysParamByName("cnyusd");
+			if (sp.isPresent()) {
+				System.out.println(sp.get().getParamValue());
+			}
 		}
 	}
 
 	@Test
 	public void getBlockChain() {
-		BlockChain bc=bolockChainService.getBolockChainByName("btc1");
+		BlockChain bc = bolockChainService.getBolockChainByName("btc1");
 		System.out.println(bc.getBcCnName());
 
 	}
