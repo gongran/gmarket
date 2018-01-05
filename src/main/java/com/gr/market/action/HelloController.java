@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.gr.market.ApiClient;
 import com.gr.market.Market02Application;
 import com.gr.market.entity.BlockChain;
+import com.gr.market.entity.CoinPrice;
 import com.gr.market.entity.SysParam;
 import com.gr.market.response.Account;
 import com.gr.market.response.Kline;
 import com.gr.market.service.BlockChainService;
+import com.gr.market.service.CoinPriceService;
 import com.gr.market.service.SysParamService;
 import com.gr.market.util.CommonUtil;
 import com.gr.market.util.DateUtil;
@@ -37,6 +39,8 @@ public class HelloController {
 	BlockChainService blockChainService;
 	@Autowired
 	SysParamService sysParamService;
+	@Autowired
+	CoinPriceService coinPriceService;
 	String API_KEY = null;
 	String API_SECRET = null;
 
@@ -74,24 +78,31 @@ public class HelloController {
 
 	@RequestMapping("/account")
 	public String kline(Map<String, Object> map) throws IOException {
-		// ApiClient client = new ApiClient(API_KEY, API_SECRET);
-		// List<Account> accounts = client.getAccounts();
-		// Map<String, String> params = null;
-		// List<Map<String, Object>> list = new ArrayList<>();
-		// for (Account at : accounts) {
-		// String id = String.valueOf(at.id);
-		// params = new HashMap<>();
-		// params.put("account-id", id);
-		// Map<String, Object> amap = client.getBalance(params);
-		// @SuppressWarnings("unchecked")
-		// List<Map<String, Object>> alist = (List<Map<String, Object>>)
-		// amap.get("list");
-		// alist = convertMapToHuman(alist, false);
-		// amap.put("list", alist);
-		// list.add(amap);
-		// }
-		// map.put("result", list);
 		return "account/accounts";
+	}
+
+	@RequestMapping("/account03")
+	@ResponseBody
+	public List<Map<String, Object>> accountDetail(Map<String, Object> map, boolean isAll) {
+		API_KEY = sysParamService.getSysParamByName("API_KEY").get().getParamValue();
+		API_SECRET = sysParamService.getSysParamByName("API_SECRET").get().getParamValue();
+		ApiClient client = new ApiClient(API_KEY, API_SECRET);
+		List<Account> accounts = client.getAccounts();
+		Map<String, String> params = null;
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (Account at : accounts) {
+			String id = String.valueOf(at.id);
+			params = new HashMap<>();
+			params.put("account-id", id);
+			Map<String, Object> amap = client.getBalance(params);
+			@SuppressWarnings("unchecked")
+			List<Map<String, Object>> alist = (List<Map<String, Object>>) amap.get("list");
+
+			alist = convertMapToHuman(alist, isAll);
+			amap.put("list", alist);
+			list.add(amap);
+		}
+		return list;
 	}
 
 	@RequestMapping("/account02")
@@ -209,28 +220,68 @@ public class HelloController {
 			String currency = String.valueOf(map.get("currency"));
 			currencys.add(currency);
 		}
-		Map<String, Map<String, Object>> am = allMarket();
+		// Map<String, Map<String, Object>> am = allMarket();
+		List<CoinPrice> cplist = coinPriceService.getAll();
+		Map<String, String> usdtMap = new HashMap<>();
+		Map<String, String> ethMap = new HashMap<>();
+		Map<String, String> btcMap = new HashMap<>();
+		for (CoinPrice cp : cplist) {
+			if (cp.getCpType().equals("USDT")) {
+				usdtMap.put(cp.getCpKey(), cp.getCpValue());
+			} else if (cp.getCpType().equals("ETH")) {
+				ethMap.put(cp.getCpKey(), cp.getCpValue());
+			} else if (cp.getCpType().equals("BTC")) {
+				btcMap.put(cp.getCpKey(), cp.getCpValue());
+			}
+
+		}
+
 		boolean con = false;
 		for (String key : currencys) {
 			Map<String, Object> map = new HashMap<>();
 			map.put("currency", key);
+			String usdEth = usdtMap.get("ETH");
+			String usdBtc = usdtMap.get("BTC");
 			for (Map<String, Object> tmap : list) {
 				if (key.equals(tmap.get("currency"))) {
-					Map<String, Object> t = am.get(key.toUpperCase());
-					String cny = "0";
-					if (t != null) {
-						cny = String.valueOf(t.get("cny"));
-					}
+					String cny = "6.4979";
 					String bstr = String.valueOf(tmap.get("balance"));
 					Double balance = Double.valueOf(bstr);
+					String uv = usdtMap.get(key.toUpperCase()) == null ? "0" : usdtMap.get(key.toUpperCase());
+					String cuv = uv.equals("0") ? "0" : CommonUtil.multiply(uv, cny);
+					String ev = ethMap.get(key.toUpperCase()) == null ? "0" : ethMap.get(key.toUpperCase());
+					String cev = ev.equals("0") ? "0" : CommonUtil.multiply(CommonUtil.multiply(ev, usdEth), cny);
+					String bv = btcMap.get(key.toUpperCase()) == null ? "0" : btcMap.get(key.toUpperCase());
+					String cbv = bv.equals("0") ? "0" : CommonUtil.multiply(CommonUtil.multiply(bv, usdEth), cny);
+
+					String lastcuv = "0";
+					if (!cuv.equals("0")) {
+						lastcuv = cuv;
+					} else if (!cev.equals("0")) {
+						lastcuv = cev;
+					} else if (!cbv.equals("0")) {
+						lastcuv = cbv;
+					}
+
+					String cnyValue = CommonUtil.amountFomat(CommonUtil.multiply(bstr, lastcuv), 8);// 人民币总价值
+					String usdtValue = CommonUtil.amountFomat(CommonUtil.multiply(bstr, uv), 8);
+					String ethValue = CommonUtil.amountFomat(CommonUtil.multiply(bstr, ev), 8);
+					String btcValue = CommonUtil.amountFomat(CommonUtil.multiply(bstr, bv), 8);
+					String vValue = CommonUtil.amountFomat(bstr, 8);// 个数
 					if ("trade".equals(tmap.get("type"))) {
 						map.put("trade", bstr);
-						map.put("cny_trade", CommonUtil.amountFomat(CommonUtil.multiply(bstr, cny), 8));
-						map.put("v_trade", CommonUtil.amountFomat(bstr, 8));
+						map.put("cny_trade", cnyValue);
+						map.put("usdt_trade", usdtValue);
+						map.put("eth_trade", ethValue);
+						map.put("btc_trade", btcValue);
+						map.put("v_trade", vValue);
 					} else {
 						map.put("frozen", tmap.get("balance"));
-						map.put("cny_frozen", CommonUtil.amountFomat(CommonUtil.multiply(bstr, cny), 8));
-						map.put("v_frozen", CommonUtil.amountFomat(bstr, 8));
+						map.put("cny_frozen", cnyValue);
+						map.put("usdt_frozen", usdtValue);
+						map.put("eth_frozen", ethValue);
+						map.put("btc_frozen", btcValue);
+						map.put("v_frozen", vValue);
 					}
 					if (!balance.equals(new Double(0))) {
 						con = true;
