@@ -295,6 +295,10 @@ public class HelloController {
 			}
 			con = false;
 		}
+		result.sort(
+				(Map<String, Object> m1, Map<String, Object> m2) -> Double.valueOf(String.valueOf(m2.get("cny_trade")))
+						.compareTo(Double.valueOf(String.valueOf(m1.get("cny_trade")))));
 		return result;
+
 	}
 }
