@@ -235,6 +235,7 @@ public class HelloController {
 			}
 
 		}
+		usdtMap.put("USDT", "1");
 
 		boolean con = false;
 		for (String key : currencys) {
@@ -242,16 +243,17 @@ public class HelloController {
 			map.put("currency", key);
 			String usdEth = usdtMap.get("ETH");
 			String usdBtc = usdtMap.get("BTC");
+			String cny = "6.4979";
 			for (Map<String, Object> tmap : list) {
 				if (key.equals(tmap.get("currency"))) {
-					String cny = "6.4979";
-					String bstr = String.valueOf(tmap.get("balance"));
+					String bstr = String.valueOf(tmap.get("balance"));//数量
 					Double balance = Double.valueOf(bstr);
-					String uv = usdtMap.get(key.toUpperCase()) == null ? "0" : usdtMap.get(key.toUpperCase());
+					String uv = usdtMap.get(key.toUpperCase()) == null ? "0" : usdtMap.get(key.toUpperCase());//usdt交易行情
 					String cuv = uv.equals("0") ? "0" : CommonUtil.multiply(uv, cny);
-					String ev = ethMap.get(key.toUpperCase()) == null ? "0" : ethMap.get(key.toUpperCase());
-					String cev = ev.equals("0") ? "0" : CommonUtil.multiply(CommonUtil.multiply(ev, usdEth), cny);
-					String bv = btcMap.get(key.toUpperCase()) == null ? "0" : btcMap.get(key.toUpperCase());
+					String ev = ethMap.get(key.toUpperCase()) == null ? "0" : ethMap.get(key.toUpperCase());//eth交易行情
+					String eth2usdt = CommonUtil.multiply(ev, usdEth);
+					String cev = ev.equals("0") ? "0" : CommonUtil.multiply(eth2usdt, cny);
+					String bv = btcMap.get(key.toUpperCase()) == null ? "0" : btcMap.get(key.toUpperCase());//比特币交易行情
 					String cbv = bv.equals("0") ? "0" : CommonUtil.multiply(CommonUtil.multiply(bv, usdEth), cny);
 
 					String lastcuv = "0";
@@ -266,6 +268,7 @@ public class HelloController {
 					String cnyValue = CommonUtil.amountFomat(CommonUtil.multiply(bstr, lastcuv), 8);// 人民币总价值
 					String usdtValue = CommonUtil.amountFomat(CommonUtil.multiply(bstr, uv), 8);
 					String ethValue = CommonUtil.amountFomat(CommonUtil.multiply(bstr, ev), 8);
+					usdtValue = usdtValue.equals("0.00000000") ? CommonUtil.amountFomat(CommonUtil.multiply(ethValue, usdEth), 8) : usdtValue;
 					String btcValue = CommonUtil.amountFomat(CommonUtil.multiply(bstr, bv), 8);
 					String vValue = CommonUtil.amountFomat(bstr, 8);// 个数
 					if ("trade".equals(tmap.get("type"))) {

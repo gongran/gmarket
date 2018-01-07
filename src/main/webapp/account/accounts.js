@@ -66,7 +66,7 @@ $(document).ready(function() {
 			html += '<p>可用数量</p>';
 			html += '</div>';
 			html += '<div class="col-lg-3">';
-			html += '<p>cny</p>';
+			html += '<p>cny&usdt</p>';
 			html += '</div>';
 			html += '<div class="col-lg-2">';
 			html += '<p>冻结数量</p>';
@@ -85,13 +85,13 @@ $(document).ready(function() {
 				html += '<p>' + bizhong.v_trade + '</p>';
 				html += '</div>';
 				html += '<div class="col-lg-3">';
-				html += '<p>' +  Math.round(bizhong.cny_trade*100)/100 + '</p>';
+				html += '<p>' +  Math.round(bizhong.cny_trade*100)/100 +"&nbsp;/&nbsp;"+ Math.round(bizhong.usdt_trade*100)/100+'</p>';
 				html += '</div>';
 				html += '<div class="col-lg-2">';
 				html += '<p>' + bizhong.v_frozen + '</p>';
 				html += '</div>';
 				html += '<div class="col-lg-3">';
-				html += '<p>' + Math.round(bizhong.cny_frozen*100)/100 + '</p>';
+				html += '<p>' + Math.round(bizhong.cny_frozen*100)/100 + "&nbsp;/&nbsp;"+ Math.round(bizhong.usdt_frozen*100)/100+'</p>';
 				html += '</div>';
 				html += '</div>';
 			}
