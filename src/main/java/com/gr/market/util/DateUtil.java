@@ -11,7 +11,7 @@ public class DateUtil {
 	 */
 	public static String dateToString(String dateStr) {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Long time = new Long(dateStr) * 1000;
+		Long time = new Long(dateStr);
 		String d = format.format(time);
 		return d;
 	}

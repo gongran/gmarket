@@ -83,7 +83,7 @@ public class ApiClient {
 	}
 
 	/**
-	 * 创建�?个ApiClient实例
+	 * 创建一个ApiClient实例
 	 * 
 	 * @param accessKeyId
 	 *            AccessKeyId
@@ -99,7 +99,7 @@ public class ApiClient {
 	}
 
 	/**
-	 * 查询交易�?
+	 * 查询交易
 	 * 
 	 * @return List of symbols.
 	 */
@@ -130,11 +130,31 @@ public class ApiClient {
 		});
 		return r.checkAndReturn();
 	}
+	
+	public List<Map<String, Object>> getInfoByUrl(String url,Map<String, String> params) {
+		ApiResponse<List<Map<String, Object>>> r = get(url, params, new TypeReference<ApiResponse<List<Map<String, Object>>>>() {
+		});
+		return r.checkAndReturn(); 
+	}
+	public String getStrInfoByUrl(String url,Map<String, String> params) {
+		ApiResponse<String> r = get(url, params, new TypeReference<ApiResponse<String>>() {
+		});
+		return r.checkAndReturn(); 
+	}
+	/**
+	 * 得到所有支持的币种
+	 * @param params
+	 * @return
+	 */
+	public List<String> getCurrencys(){
+		String url="/v1/common/currencys";
+		ApiResponse<List<String>> r = get(url, null, new TypeReference<ApiResponse<List<String>>>() {
+		});
+		return r.checkAndReturn();
+	}
 
 	/**
-	 * 查询�?有账户信�?
-	 * 
-	 * @return List of accounts.
+	 * 查询所有账户信息
 	 */
 	public List<Account> getAccounts() {
 		ApiResponse<List<Account>> resp = get("/v1/account/accounts", null,
