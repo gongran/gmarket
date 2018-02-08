@@ -18,12 +18,13 @@ import com.gr.market.service.BlockChainService;
 import com.gr.market.util.JsonUtil;
 
 public class ApiTest {
-	static final String API_KEY = "";
-	static final String API_SECRET = "";
+	static final String API_KEY = "baa2ec0c-0cab5648-6f089f58-0433b";
+	static final String API_SECRET = "28af774e-6ad3f167-6d7e5-88e01954";
+	ApiClient client = new ApiClient(API_KEY, API_SECRET);
 
+	//得到各个账户的状态
 	@Test
 	public void testAccounts() {
-		ApiClient client = new ApiClient(API_KEY, API_SECRET);
 		List<Account> accounts = client.getAccounts();
 		Map<String, String> params = null;
 		List<Map<String, Object>> list = null;
@@ -34,13 +35,15 @@ public class ApiTest {
 			params.put("account-id", id);
 		}
 	}
+	
+	
+	
 
+	//得到各种货币的行情
 	@Test
 	public void testPrice() {
 		ApplicationContext context = SpringApplication.run(Market02Application.class);
-
 		BlockChainService blockChainService = (BlockChainService) context.getBean("blockChainService");
-		ApiClient client = new ApiClient(API_KEY, API_SECRET);
 		List<BlockChain> list = blockChainService.getAllBlockChain();
 		Map<String, String> params = new HashMap<>();
 		params.put("period", "1min");
