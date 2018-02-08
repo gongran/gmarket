@@ -43,12 +43,27 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * 聚合行情
+	 */
 	public void juhe(){
 		String url="/market/detail/merged";
 		Map<String, String> params = new HashMap<>();
-		params.put("symbol", "btcusdt");
+		params.put("symbol", "htusdt");
 		List<Map<String,Object>> list=client.getInfoTickByUrl(url, params);
-		print(list);
+		Map<String,Object> map=list.get(0);
+		String close=map.get("close").toString();
+		System.out.println("usdt:"+close);
+		params.put("symbol", "hteth");
+		list=client.getInfoTickByUrl(url, params);
+		map=list.get(0);
+		close=map.get("close").toString();
+		System.out.println("eth:"+close);
+		params.put("symbol", "htbtc");
+		list=client.getInfoTickByUrl(url, params);
+		map=list.get(0);
+		close=map.get("close").toString();
+		System.out.println("btc:"+close);
 	}
 
 	public void apiSample() {
