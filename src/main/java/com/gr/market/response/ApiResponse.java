@@ -8,6 +8,7 @@ public class ApiResponse<T> {
   public String errCode;
   public String errMsg;
   public T data;
+  public T tick;
 
   public T checkAndReturn() {
     if ("ok".equals(status)) {
@@ -15,4 +16,10 @@ public class ApiResponse<T> {
     }
     throw new ApiException(errCode, errMsg);
   }
+  public T checkAndReturnTick() {
+	    if ("ok".equals(status)) {
+	      return tick;
+	    }
+	    throw new ApiException(errCode, errMsg);
+	  }
 }
