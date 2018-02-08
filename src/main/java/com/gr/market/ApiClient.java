@@ -136,6 +136,11 @@ public class ApiClient {
 		});
 		return r.checkAndReturn(); 
 	}
+	public List<Map<String, Object>> getInfoTickByUrl(String url,Map<String, String> params) {
+		ApiResponse<List<Map<String, Object>>> r = get(url, params, new TypeReference<ApiResponse<List<Map<String, Object>>>>() {
+		});
+		return r.checkAndReturnTick(); 
+	}
 	public String getStrInfoByUrl(String url,Map<String, String> params) {
 		ApiResponse<String> r = get(url, params, new TypeReference<ApiResponse<String>>() {
 		});
