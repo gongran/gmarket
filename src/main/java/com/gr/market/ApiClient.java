@@ -273,6 +273,7 @@ public class ApiClient {
  * @author liaoxuefeng
  */
 class ApiSignature {
+	static boolean isLog=false;
 
 	final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -330,7 +331,7 @@ class ApiSignature {
 		byte[] hash = hmacSha256.doFinal(payload.getBytes(StandardCharsets.UTF_8));
 		String actualSign = Base64.getEncoder().encodeToString(hash);
 		params.put("Signature", actualSign);
-		if (log.isDebugEnabled()) {
+		if (isLog&&log.isDebugEnabled()) {
 			log.debug("Dump parameters:");
 			for (Map.Entry<String, String> entry : params.entrySet()) {
 				log.debug("  key: " + entry.getKey() + ", value: " + entry.getValue());
